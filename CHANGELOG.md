@@ -4,6 +4,12 @@ All notable changes to `react-native-foldface` will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] — 2026-08-06
+
+### Changed
+
+- Republished after account email change; no source changes.
+
 ## [1.0.0] — 2026-08-04
 
 ### Added

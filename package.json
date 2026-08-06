@@ -1,6 +1,6 @@
 {
   "name": "react-native-foldface",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "FoldView component for React Native — cover/reveal fold animation built with Reanimated 4 and worklets",
   "keywords": [
     "react-native",
