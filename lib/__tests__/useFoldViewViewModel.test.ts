@@ -90,4 +90,40 @@ describe("useFoldViewViewModel", () => {
 
     await waitFor(() => expect(result.current.isFlipped).toBe(true));
   });
+
+  it("expands children sequentially and collapses them in reverse order", async () => {
+    const { result, rerender } = await renderHook(
+      (props: { expanded: boolean }) => useFoldViewViewModel({ expanded: props.expanded }),
+      { initialProps: { expanded: false } },
+    );
+
+    const callOrder: string[] = [];
+
+    const fold1 = makeFakeFold();
+    fold1.expand.mockImplementation(async () => { callOrder.push('expand1'); });
+    fold1.collapse.mockImplementation(async () => { callOrder.push('collapse1'); });
+
+    const fold2 = makeFakeFold();
+    fold2.expand.mockImplementation(async () => { callOrder.push('expand2'); });
+    fold2.collapse.mockImplementation(async () => { callOrder.push('collapse2'); });
+
+    await act(() => {
+      result.current.contextValue?.(fold1);
+      result.current.contextValue?.(fold2);
+    });
+
+    await rerender({ expanded: true });
+
+    await waitFor(() => {
+      expect(callOrder).toEqual(['expand1', 'expand2']);
+    });
+
+    callOrder.length = 0;
+
+    await rerender({ expanded: false });
+
+    await waitFor(() => {
+      expect(callOrder).toEqual(['collapse2', 'collapse1']);
+    });
+  });
 });
