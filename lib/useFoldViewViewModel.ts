@@ -113,14 +113,15 @@ export function useFoldViewViewModel(props: FoldViewProps): UseFoldViewViewModel
   };
 
   const selfRef = useRef<FoldRef | null>(null);
+  const getRevealHeight = () => revealHeightRef.current ?? baseLayoutRef.current?.height ?? 0;
   selfRef.current ??= {
     expand: () => expandRef.current(),
     collapse: () => collapseRef.current(),
     rasterize: (shouldRasterize) => rasterizeRef.current(shouldRasterize),
     getBaseHeight: () => baseLayoutRef.current?.height ?? 0,
-    getRevealHeight: () => revealHeightRef.current ?? baseLayoutRef.current?.height ?? 0,
+    getRevealHeight,
     getTreeRevealHeight: () =>
-      (revealHeightRef.current ?? baseLayoutRef.current?.height ?? 0) +
+      getRevealHeight() +
       childrenFolds.current.reduce((sum, fold) => sum + fold.getTreeRevealHeight(), 0),
     getFlipDuration: () => flipDurationRef.current,
   };
