@@ -85,21 +85,20 @@ export function useFoldViewViewModel(props: FoldViewProps): UseFoldViewViewModel
   const flipDurationRef = useRef(flipDuration);
   flipDurationRef.current = flipDuration;
 
-  const expandFold = useCallback(async () => {
-    setIsFlipped(true);
-    await Promise.all([
-      animateTo(coverRot, 180, flipDurationRef.current),
-      animateTo(revealRot, 0, flipDurationRef.current),
-    ]);
-  }, [coverRot, revealRot]);
+  const toggleFold = useCallback(
+    async (nextFlipped: boolean, coverTo: number, revealTo: number) => {
+      setIsFlipped(nextFlipped);
+      await Promise.all([
+        animateTo(coverRot, coverTo, flipDurationRef.current),
+        animateTo(revealRot, revealTo, flipDurationRef.current),
+      ]);
+    },
+    [coverRot, revealRot],
+  );
 
-  const collapseFold = useCallback(async () => {
-    setIsFlipped(false);
-    await Promise.all([
-      animateTo(coverRot, 0, flipDurationRef.current),
-      animateTo(revealRot, -180, flipDurationRef.current),
-    ]);
-  }, [coverRot, revealRot]);
+  const expandFold = useCallback(() => toggleFold(true, 180, 0), [toggleFold]);
+
+  const collapseFold = useCallback(() => toggleFold(false, 0, -180), [toggleFold]);
 
   const expandRef = useRef(expandFold);
   expandRef.current = expandFold;
