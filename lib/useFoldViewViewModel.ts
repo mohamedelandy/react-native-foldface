@@ -166,17 +166,13 @@ export function useFoldViewViewModel(props: FoldViewProps): UseFoldViewViewModel
       onAnimationStart?.(totalDuration, height);
 
       if (nextExpanded) {
-        for (const fold of folds) {
-          await fold.rasterize(true);
-        }
+        await Promise.all(folds.map((fold) => fold.rasterize(true)));
         await selfRef.current?.expand();
         await propsRef.current.expand(folds);
       } else {
         await propsRef.current.collapse(folds);
         await selfRef.current?.collapse();
-        for (const fold of folds) {
-          await fold.rasterize(false);
-        }
+        await Promise.all(folds.map((fold) => fold.rasterize(false)));
       }
 
       onAnimationEnd?.(totalDuration, height);
