@@ -31,6 +31,37 @@ describe("useFoldViewViewModel", () => {
     expect(result.current.baseLayout).toEqual(layout);
   });
 
+  it("removes unregistered children from flip height and duration", async () => {
+    const onAnimationStart = jest.fn();
+    const onAnimationEnd = jest.fn();
+
+    const { result, rerender } = await renderHook(
+      (props: { expanded: boolean }) =>
+        useFoldViewViewModel({ expanded: props.expanded, onAnimationStart, onAnimationEnd }),
+      { initialProps: { expanded: false } },
+    );
+
+    await act(() => result.current.handleLayout(layoutEvent(layout)));
+
+    const fakeFold = makeFakeFold();
+    let unsubscribe: (() => void) | undefined;
+    await act(() => {
+      unsubscribe = result.current.contextValue?.(fakeFold);
+      expect(unsubscribe).toBeDefined();
+    });
+
+    await act(() => {
+      unsubscribe?.();
+    });
+
+    await rerender({ expanded: true });
+
+    await waitFor(() => expect(onAnimationEnd).toHaveBeenCalled());
+    expect(onAnimationStart).toHaveBeenCalledWith(280, 100);
+    expect(onAnimationEnd).toHaveBeenCalledWith(280, 100);
+    expect(fakeFold.expand).not.toHaveBeenCalled();
+  });
+
   it("reports the double-counted base height plus nested heights on expand", async () => {
     const onAnimationStart = jest.fn();
     const onAnimationEnd = jest.fn();
