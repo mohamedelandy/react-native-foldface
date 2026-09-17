@@ -42,6 +42,24 @@ const rotateXOf = (element: TestInstance): string | undefined => {
 };
 
 describe("FoldView", () => {
+  it("renders the loading indicator before the base is laid out", async () => {
+    const renderLoading = jest.fn(() => <Text testID="loading">loading...</Text>);
+    const { getByTestId, queryByTestId } = await render(
+      <FoldView renderLoading={renderLoading} cover={<Text testID="front">front</Text>}>
+        <Text testID="base">base</Text>
+      </FoldView>
+    );
+
+    expect(renderLoading).toHaveBeenCalled();
+    expect(getByTestId("loading")).toBeTruthy();
+    expect(queryByTestId("base")).toBeNull();
+
+    await fireEvent(parentOf(getByTestId("loading")), "layout", layoutEvent(layout));
+
+    expect(queryByTestId("loading")).toBeNull();
+    expect(getByTestId("base")).toBeTruthy();
+  });
+
   it("renders the base content and faces once the base is laid out", async () => {
     const { getByTestId, queryByTestId } = await render(
       <FoldView
