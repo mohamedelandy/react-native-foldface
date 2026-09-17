@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 import type { LayoutChangeEvent } from "react-native";
-import type { Layout } from "../types";
-import { useFoldViewViewModel } from "../useFoldViewViewModel";
+import type { Layout, FoldRef } from "../types";
+import { useFoldViewViewModel, sequentialExpand, sequentialCollapse } from "../useFoldViewViewModel";
 
 const layout: Layout = { x: 0, y: 0, width: 100, height: 50 };
 
@@ -156,5 +156,61 @@ describe("useFoldViewViewModel", () => {
     await waitFor(() => {
       expect(callOrder).toEqual(['collapse2', 'collapse1']);
     });
+  });
+});
+
+describe("sequentialExpand", () => {
+  it("expands folds in sequential order", async () => {
+    const order: number[] = [];
+
+    const fold1 = makeFakeFold() as unknown as FoldRef;
+    fold1.expand = jest.fn(async () => {
+      order.push(1);
+    });
+
+    const fold2 = makeFakeFold() as unknown as FoldRef;
+    fold2.expand = jest.fn(async () => {
+      order.push(2);
+    });
+
+    const fold3 = makeFakeFold() as unknown as FoldRef;
+    fold3.expand = jest.fn(async () => {
+      order.push(3);
+    });
+
+    await sequentialExpand([fold1, fold2, fold3]);
+
+    expect(order).toEqual([1, 2, 3]);
+    expect(fold1.expand).toHaveBeenCalledTimes(1);
+    expect(fold2.expand).toHaveBeenCalledTimes(1);
+    expect(fold3.expand).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("sequentialCollapse", () => {
+  it("collapses folds in reverse sequential order", async () => {
+    const order: number[] = [];
+
+    const fold1 = makeFakeFold() as unknown as FoldRef;
+    fold1.collapse = jest.fn(async () => {
+      order.push(1);
+    });
+
+    const fold2 = makeFakeFold() as unknown as FoldRef;
+    fold2.collapse = jest.fn(async () => {
+      order.push(2);
+    });
+
+    const fold3 = makeFakeFold() as unknown as FoldRef;
+    fold3.collapse = jest.fn(async () => {
+      order.push(3);
+    });
+
+    await sequentialCollapse([fold1, fold2, fold3]);
+
+    expect(order).toEqual([3, 2, 1]);
+    expect(fold1.collapse).toHaveBeenCalledTimes(1);
+    expect(fold2.collapse).toHaveBeenCalledTimes(1);
+    expect(fold3.collapse).toHaveBeenCalledTimes(1);
   });
 });

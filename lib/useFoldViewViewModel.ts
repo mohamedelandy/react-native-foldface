@@ -11,13 +11,13 @@ import {
 import { FoldViewContext } from "./foldViewContext";
 import type { FoldRef, FoldViewProps, Layout, Register } from "./types";
 
-const sequentialExpand = async (foldViews: FoldRef[]) => {
+export const sequentialExpand = async (foldViews: FoldRef[]) => {
   for (const foldView of foldViews) {
     await foldView.expand();
   }
 };
 
-const sequentialCollapse = async (foldViews: FoldRef[]) => {
+export const sequentialCollapse = async (foldViews: FoldRef[]) => {
   const reversed = [...foldViews].reverse();
   for (const foldView of reversed) {
     await foldView.collapse();
